@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#080a0f">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Count Craze</title>
+<style>
+:root{
+ --bg:#f4f6f8;--panel:#ffffff;--panel2:#eef1f4;--line:#d7dde5;--text:#10141b;--muted:#667181;
+ --accent:#1976ff;--accentText:#ffffff;--danger:#ef3340;--display:#cfe9ff;--displayText:#08121d;
+ --num:#e7eaee;--numText:#11151b;--op:#1976ff;--opText:#fff;--memory:#ff9f18;--memoryText:#15100a;
+ --eq:#ffd21c;--eqText:#241d00;--positive:#20bf55;--positiveText:#fff;--clear:#ff3945;--clearText:#fff;
+}
+:root[data-theme="dark"]{
+ --bg:#070a0f;--panel:#10151d;--panel2:#171d27;--line:#293240;--text:#f5f7fb;--muted:#919bab;
+ --accent:#2b8cff;--accentText:#fff;--danger:#ff6975;--display:#12263b;--displayText:#f8fbff;
+ --num:#252c37;--numText:#f7f9fc;--op:#168cff;--opText:#fff;--memory:#ff9d16;--memoryText:#fff;
+ --eq:#ffd21c;--eqText:#241d00;--positive:#19c95a;--positiveText:#fff;--clear:#ff3d4d;--clearText:#fff;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+body{overscroll-behavior:none}
+.app{width:min(100%,430px);min-height:100vh;min-height:100dvh;margin:auto;background:#0a0d12;position:relative;overflow:hidden;display:flex;flex-direction:column}
+.top{height:64px;padding:calc(env(safe-area-inset-top) + 10px) 14px 8px;display:flex;align-items:center;gap:10px;background:#0a0d12;position:sticky;top:0;z-index:20;border-bottom:1px solid #151a23}
+.menu{width:44px;height:44px;border:0;background:transparent;color:#fff;border-radius:12px;font-size:27px;display:grid;place-items:center}
+.menu:active{background:#171c26}
+.logo{font-size:20px;font-weight:850;letter-spacing:.2px}.logo span{color:#1976ff}.themeBtn{width:42px;height:42px;border:1px solid var(--line);background:var(--panel2);color:var(--text);border-radius:12px;font-size:18px}.offline{margin-left:auto;font-size:10px;color:#788294;border:1px solid #252c39;padding:5px 8px;border-radius:20px}
+body{background:var(--bg)}main{padding:12px 14px 0;flex:1;display:flex;flex-direction:column;min-height:0}.top{background:var(--bg);border-bottom-color:var(--line)}
+.page{display:none}.page.active{display:block;flex:1;min-height:100%;width:100%;background:var(--bg)}
+.display{background:var(--display);color:var(--displayText);border:2px solid var(--line);border-radius:26px;padding:24px 20px 18px;height:202px;text-align:right;margin-bottom:18px;box-shadow:inset 0 2px 0 rgba(255,255,255,.4),inset 0 -2px 8px rgba(0,0,0,.05);display:flex;flex-direction:column;justify-content:flex-end}
+.expression{height:28px;color:var(--muted);font-size:16px;overflow:hidden}
+.answer{font-size:58px;font-weight:800;line-height:1.1;overflow:hidden;white-space:nowrap;color:var(--displayText);letter-spacing:-1px}
+.keys{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+.keys .key:nth-child(1){grid-column:1}
+.keys .key:nth-child(2){grid-column:2}
+.keys .key:nth-child(3){grid-column:3}
+.keys .key:nth-child(4){grid-column:4}
+.keys .key:nth-child(5){grid-column:1}
+.keys .key:nth-child(6){grid-column:2}
+.keys .key:nth-child(7){grid-column:3}
+.keys .key:nth-child(8){grid-column:4}
+.keys .key:nth-child(9){grid-column:5}
+.keys .key:nth-child(10){grid-column:1}
+.keys .key:nth-child(11){grid-column:2}
+.keys .key:nth-child(12){grid-column:3}
+.keys .key:nth-child(13){grid-column:4}
+.keys .key:nth-child(14){grid-column:5}
+.keys .key:nth-child(15){grid-column:1}
+.keys .key:nth-child(16){grid-column:2}
+.keys .key:nth-child(17){grid-column:3}
+.keys .key:nth-child(18){grid-column:4}
+.keys .key:nth-child(19){grid-column:5}
+.keys .key:nth-child(20){grid-column:1}
+.keys .key:nth-child(21){grid-column:2}
+.keys .key:nth-child(22){grid-column:3}
+.keys .key:nth-child(23){grid-column:4}
+.keys .key:nth-child(24){grid-column:5}
+.keys .key:nth-child(-n+4){height:78px}.keys .key:nth-child(n+5){height:78px}.key{height:78px;border:0;border-radius:20px;background:var(--num);color:var(--numText);font-size:27px;font-weight:850;touch-action:manipulation;box-shadow:0 4px 0 rgba(0,0,0,.15),inset 0 1px 0 rgba(255,255,255,.45);border:1px solid var(--line);display:flex;align-items:center;justify-content:center}
+.key:active{transform:translateY(3px) scale(.985);box-shadow:0 1px 0 rgba(0,0,0,.12)}
+.key.op{background:var(--op);color:var(--opText);border-color:transparent}.key.memory{background:var(--memory);color:var(--memoryText);border-color:transparent}.key.eq{background:var(--eq);color:var(--eqText);border-color:#e1b900}.key.ac{background:var(--clear);color:var(--clearText);border-color:transparent}
+.drawer{position:fixed;inset:0;z-index:50;pointer-events:none}.drawer.open{pointer-events:auto}
+.scrim{position:absolute;inset:0;background:rgba(0,0,0,.5);opacity:0;transition:.2s}.drawer.open .scrim{opacity:1}
+.panel{position:absolute;left:0;top:0;bottom:0;width:min(310px,82vw);background:var(--panel);border-right:1px solid #252c39;padding:calc(env(safe-area-inset-top) + 14px) 14px 20px;transform:translateX(-100%);transition:.24s ease;box-shadow:20px 0 60px #0008}
+.drawer.open .panel{transform:none}
+.panelHead{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}.panelHead b{font-size:20px}.close{background:#171c26;border:0;color:#fff;border-radius:10px;width:38px;height:38px;font-size:22px}
+.option{width:100%;display:flex;align-items:center;gap:12px;background:transparent;border:0;color:var(--text);padding:14px 12px;border-radius:13px;text-align:left;font-weight:700;font-size:14px}
+.option:active,.option.active{background:var(--panel2)}.icon{width:25px;text-align:center;color:#9aaeff}
+.card{background:var(--panel);border:1px solid var(--line);box-shadow:0 2px 10px rgba(0,0,0,.06);border-radius:18px;padding:14px;margin-bottom:12px}
+.title{font-weight:800;font-size:15px;margin-bottom:12px}.muted{font-size:11px;color:var(--muted)}
+.seg{display:flex;gap:5px;padding:5px;background:#080b10;border-radius:13px;margin-bottom:12px}
+.seg button{flex:1;border:0;border-radius:9px;background:transparent;color:#8f99aa;padding:9px 5px;font-size:10px;font-weight:800}
+.seg button.active{background:#e9edf4;color:#090b10}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}.field{margin-bottom:10px}.field label{display:block;color:#9aa4b4;font-size:10px;margin-bottom:5px}
+input,select{width:100%;background:#080b10;color:#fff;border:1px solid #293140;border-radius:11px;padding:11px;font-size:14px;outline:0}
+.action{width:100%;border:0;background:#e9edf4;color:#090b10;border-radius:12px;padding:12px;font-weight:800}
+.result{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.metric{background:#090c11;border-radius:12px;padding:10px}.metric span{display:block;color:#8792a4;font-size:10px}.metric b{display:block;margin-top:4px;font-size:14px}
+.history{max-height:420px;overflow:auto}.hist{display:flex;justify-content:space-between;gap:8px;padding:11px 0;border-bottom:1px solid #222936;font-size:12px}.hist small{color:#7f899a;display:block;margin-top:3px}.x{background:none;border:0;color:var(--danger);font-size:20px}
+canvas{width:100%;height:170px;background:#080b10;border-radius:14px;margin-top:12px}.hide{display:none!important}
+.toast{position:fixed;bottom:18px;left:50%;transform:translate(-50%,20px);opacity:0;background:#eef2f7;color:#080a0e;padding:10px 14px;border-radius:11px;font-size:12px;font-weight:700;z-index:100;transition:.2s;pointer-events:none}.toast.show{opacity:1;transform:translate(-50%,0)}
+@media(max-width:350px){.display{height:175px}.key{height:64px;font-size:22px;border-radius:16px}.answer{font-size:46px}.logo{font-size:18px}.offline{display:none}.top{padding-left:9px;padding-right:9px}main{padding-left:9px;padding-right:9px}.keys{gap:7px}.bottomItem{font-size:9px}.bottomIcon{font-size:21px}}
+
+.bottomNav{display:grid;flex-shrink:0;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line);background:var(--panel);padding:10px 4px calc(10px + env(safe-area-inset-bottom));position:sticky;bottom:0;z-index:15}
+.bottomItem{border:0;background:transparent;color:var(--muted);font-size:10px;font-weight:750;display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 2px;min-height:52px}
+.bottomItem.active{color:var(--accent)}
+.bottomIcon{font-size:23px;line-height:22px}
+.bottomItem span:last-child{white-space:nowrap}
+
+
+.loanHeader{margin:2px 0 12px}.loanHeader h2{font-size:25px;margin:4px 2px 16px;font-weight:850}
+.loanTabs{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--line);margin:0 -14px;padding:0 8px}
+.loanTab{border:0;background:transparent;color:var(--muted);font-size:14px;font-weight:850;padding:14px 4px 12px;border-bottom:3px solid transparent}
+.loanTab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.loanPane{display:none}.loanPane.active{display:block}
+.loanCard{padding:18px}.loanModeTitle{text-align:center;font-size:25px;font-weight:850;margin:2px 0 18px}
+.loanActions{display:grid;grid-template-columns:1fr 1.4fr;gap:10px;margin-top:8px}.secondaryAction{border:1px solid var(--line);background:transparent;color:var(--accent);border-radius:12px;padding:12px;font-weight:850}
+.reportGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.reportRow{background:var(--panel2);border-radius:12px;padding:11px}.reportRow span{display:block;color:var(--muted);font-size:10px}.reportRow b{display:block;margin-top:4px;font-size:14px}
+.reportEmpty{color:var(--muted);font-size:13px;padding:10px 0}.graphCaption{padding:8px 2px 0}
+.savedLoans{margin-top:14px}.savedLoan{background:var(--panel2);border:1px solid var(--line);border-radius:15px;padding:16px;margin-top:10px;text-align:center}
+.savedLoan h3{margin:0 0 12px;font-size:21px}.savedLoan p{margin:7px 0;color:var(--muted);font-size:13px}.savedLoan strong{color:var(--text)}
+.savedBtns{display:flex;justify-content:center;gap:24px;margin-top:14px}.savedBtns button{border:0;background:transparent;color:var(--accent);font-weight:850;font-size:13px}
+@media(max-width:350px){.loanTabs{margin:0 -9px}.loanTab{font-size:11px}.loanModeTitle{font-size:22px}}
+
+
+.amortTitle{font-size:17px;font-weight:850;margin:18px 0 9px}.amortScroll{overflow-x:auto;border:1px solid var(--line);border-radius:12px;max-height:360px}
+.amortTable{width:100%;border-collapse:collapse;min-width:510px;font-size:11px}.amortTable th,.amortTable td{padding:9px 8px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}.amortTable th:first-child,.amortTable td:first-child{text-align:center}.amortTable th{position:sticky;top:0;background:var(--panel2);color:var(--muted)}
+
+
+/* FINAL DAY MODE VISIBILITY FIX */
+:root:not([data-theme="dark"]) html,
+:root:not([data-theme="dark"]) body,
+:root:not([data-theme="dark"]) .app,
+:root:not([data-theme="dark"]) main,
+:root:not([data-theme="dark"]) .page.active{
+  background:#f4f6f8 !important;
+  color:#10141b !important;
+}
+:root:not([data-theme="dark"]) .top{
+  background:#f4f6f8 !important;
+  color:#10141b !important;
+  border-bottom-color:#d7dde5 !important;
+}
+:root:not([data-theme="dark"]) .menu{color:#10141b !important}
+:root:not([data-theme="dark"]) .logo{color:#10141b !important}
+:root:not([data-theme="dark"]) input:not([type="checkbox"]),
+:root:not([data-theme="dark"]) select{
+  background:#ffffff !important;
+  color:#05070a !important;
+  -webkit-text-fill-color:#05070a !important;
+  caret-color:#05070a !important;
+  border:1.5px solid #8e98a5 !important;
+  box-shadow:inset 0 1px 2px rgba(0,0,0,.04) !important;
+}
+:root:not([data-theme="dark"]) input::placeholder{
+  color:#697482 !important;
+  -webkit-text-fill-color:#697482 !important;
+}
+:root:not([data-theme="dark"]) .metric{
+  background:#eef2f6 !important;
+  border:1px solid #c7d0da !important;
+  color:#05070a !important;
+}
+:root:not([data-theme="dark"]) .metric span{
+  color:#596473 !important;
+}
+:root:not([data-theme="dark"]) .metric b{
+  color:#05070a !important;
+  -webkit-text-fill-color:#05070a !important;
+  font-weight:900 !important;
+}
+:root:not([data-theme="dark"]) .result .metric,
+:root:not([data-theme="dark"]) .result .metric *{
+  opacity:1 !important;
+  visibility:visible !important;
+}
+:root:not([data-theme="dark"]) .loanCard{
+  background:#ffffff !important;
+  color:#10141b !important;
+  border-color:#cbd3dc !important;
+}
+:root:not([data-theme="dark"]) .loanModeTitle,
+:root:not([data-theme="dark"]) .loanHeader h2{
+  color:#05070a !important;
+}
+:root:not([data-theme="dark"]) .seg{
+  background:#11151b !important;
+}
+:root:not([data-theme="dark"]) .seg button{
+  color:#aeb7c3 !important;
+}
+:root:not([data-theme="dark"]) .seg button.active{
+  background:#e7edf4 !important;
+  color:#05070a !important;
+}
+:root:not([data-theme="dark"]) .action{
+  background:#e7edf4 !important;
+  color:#05070a !important;
+}
+:root:not([data-theme="dark"]) .secondaryAction{
+  color:#075fd6 !important;
+}
+:root:not([data-theme="dark"]) .loanTab{
+  color:#5d6877 !important;
+}
+:root:not([data-theme="dark"]) .loanTab.active{
+  color:#075fd6 !important;
+}
+:root:not([data-theme="dark"]) .field label{
+  color:#5d6877 !important;
+}
+:root:not([data-theme="dark"]) .reportRow{
+  background:#eef2f6 !important;
+  border-color:#c7d0da !important;
+}
+:root:not([data-theme="dark"]) .reportRow span{
+  color:#596473 !important;
+}
+:root:not([data-theme="dark"]) .reportRow b{
+  color:#05070a !important;
+  -webkit-text-fill-color:#05070a !important;
+  font-weight:900 !important;
+}
+:root:not([data-theme="dark"]) .savedLoan{
+  background:#eef2f6 !important;
+  border-color:#c7d0da !important;
+}
+:root:not([data-theme="dark"]) .savedLoan h3,
+:root:not([data-theme="dark"]) .savedLoan strong{
+  color:#05070a !important;
+}
+:root:not([data-theme="dark"]) .savedLoan p{
+  color:#4f5966 !important;
+}
+:root:not([data-theme="dark"]) .amortTable{
+  color:#05070a !important;
+}
+:root:not([data-theme="dark"]) .amortTable th{
+  background:#e2e7ed !important;
+  color:#303944 !important;
+}
+:root:not([data-theme="dark"]) .amortTable td{
+  color:#05070a !important;
+}
+:root:not([data-theme="dark"]) .bottomNav{
+  background:#ffffff !important;
+  border-top-color:#cbd3dc !important;
+}
+:root:not([data-theme="dark"]) .bottomItem{
+  color:#5d6877 !important;
+}
+:root:not([data-theme="dark"]) .bottomItem.active{
+  color:#075fd6 !important;
+}
+
+</style>
+
+<style>
+#installAppBtn{
+  position:fixed;
+  right:14px;
+  bottom:86px;
+  z-index:80;
+  display:none;
+  border:0;
+  border-radius:18px;
+  padding:12px 16px;
+  background:#1976ff;
+  color:#fff;
+  font-size:13px;
+  font-weight:900;
+  box-shadow:0 6px 18px rgba(0,0,0,.22);
+}
+body.dark #installAppBtn{background:#1976ff;color:#fff}
+#installAppBtn.show{display:block}
+</style>
+
+<link rel="manifest" href="./manifest.webmanifest">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Count Craze">
+<meta name="theme-color" content="#1976ff">
+</head>
+<body>
+<div class="app">
+<header class="top"><button class="menu" id="menuBtn" aria-label="Open menu">☰</button><div class="logo">Count <span>Craze</span></div><button class="themeBtn" id="themeBtn" type="button" aria-label="Switch theme">☀️</button><div class="offline">OFFLINE</div></header>
+
+<div class="drawer" id="drawer">
+<div class="scrim" id="scrim"></div>
+<aside class="panel">
+<div class="panelHead"><b>Count Craze</b><button class="close" id="closeBtn">×</button></div>
+<button class="option active" data-page="calc"><span class="icon">⌗</span>Standard Calculator</button>
+<button class="option" data-page="date"><span class="icon">◷</span>Date Calculator</button>
+<button class="option" data-page="loan"><span class="icon">₹</span>Loan / EMI / Moratorium</button>
+<button class="option" data-page="deposit"><span class="icon">▣</span>FD / RD Calculator</button>
+<button class="option" data-page="sip"><span class="icon">↗</span>SIP Calculator</button>
+<button class="option" data-page="history"><span class="icon">↺</span>History</button>
+</aside></div>
+
+<main>
+<section id="calc" class="page active">
+<div class="display">
+  <div class="expression" id="expr"></div>
+  <div class="answer" id="disp">0</div>
+</div>
+
+<div class="keys">
+  <!-- Row 1: OFF / ON / CE / divide -->
+  <button class="key ac" data-k="OFF">OFF</button>
+  <button class="key" style="background:var(--positive);color:var(--positiveText);border-color:transparent" data-k="ON">ON</button>
+  <button class="key" style="background:var(--accent);color:var(--accentText);border-color:transparent" data-k="CE">CE</button>
+  <button class="key op" data-k="back">⌫</button>
+
+  <!-- Row 2 -->
+  <button class="key memory" data-k="MC">MC</button>
+  <button class="key" data-k="7">7</button>
+  <button class="key" data-k="8">8</button>
+  <button class="key" data-k="9">9</button>
+  <button class="key op" data-k="/">÷</button>
+
+  <!-- Row 3 -->
+  <button class="key memory" data-k="M+">M+</button>
+  <button class="key" data-k="4">4</button>
+  <button class="key" data-k="5">5</button>
+  <button class="key" data-k="6">6</button>
+  <button class="key op" data-k="*">×</button>
+
+  <!-- Row 4 -->
+  <button class="key memory" data-k="M-">M-</button>
+  <button class="key" data-k="1">1</button>
+  <button class="key" data-k="2">2</button>
+  <button class="key" data-k="3">3</button>
+  <button class="key op" data-k="-">−</button>
+
+  <!-- Row 5 -->
+  <button class="key" data-k="+/-">+/-</button>
+  <button class="key" data-k="sqrt">√</button>
+  <button class="key" data-k="0">0</button>
+  <button class="key" data-k="%">%</button>
+  <button class="key eq" data-k="=">=</button>
+</div>
+</section>
+
+<section id="date" class="page">
+<div class="card"><div class="title">Date Calculator</div>
+<div class="seg"><button class="active" onclick="setDateMode('diff',this)">DIFFERENCE</button><button onclick="setDateMode('add',this)">ADD</button><button onclick="setDateMode('sub',this)">SUBTRACT</button></div>
+<div class="grid"><div class="field"><label>Start date</label><input id="d1" type="date"></div><div class="field"><label>End date</label><input id="d2" type="date"></div></div>
+<div id="dateAmount" class="grid hide"><div class="field"><label>Value</label><input id="dnum" type="number" value="1" min="0"></div><div class="field"><label>Unit</label><select id="dunit"><option value="d">Days</option><option value="w">Weeks</option><option value="m">Months</option><option value="y">Years</option></select></div></div>
+<button class="action" onclick="calcDate()">Calculate</button><div id="dateRes"></div></div>
+</section>
+
+<section id="loan" class="page">
+<div class="loanHeader">
+  <h2>Loan - Basic</h2>
+  <div class="loanTabs" role="tablist" aria-label="Loan sections">
+    <button class="loanTab active" data-loantab="input">INPUT</button>
+    <button class="loanTab" data-loantab="report">REPORT</button>
+    <button class="loanTab" data-loantab="graph">GRAPH</button>
+    <button class="loanTab" data-loantab="save">SAVE</button>
+  </div>
+</div>
+
+<div id="loanInput" class="loanPane active">
+<div class="card loanCard">
+  <div class="loanModeTitle">EMI - Basic</div>
+  <div class="seg">
+    <button class="active" data-loanmode="emi">EMI</button>
+    <button data-loanmode="mor">MORATORIUM</button>
+  </div>
+  <div class="grid">
+    <div class="field"><label>Loan Amount (₹)</label><input id="la" type="number" value="1000000" min="1" step="100"></div>
+    <div class="field"><label>Annual Interest Rate (%)</label><input id="lr" type="number" value="8.5" min="0" step=".01"></div>
+    <div class="field"><label>Loan Term</label><input id="ly" type="number" value="10" min=".01" step=".01"></div>
+    <div class="field"><label>Term Unit</label><select id="loanUnit"><option value="y">Years</option><option value="m">Months</option></select></div>
+  </div>
+
+  <div class="field">
+    <label style="display:flex;align-items:center;gap:8px;color:var(--text);font-size:12px">
+      <input id="showAmort" type="checkbox" style="width:18px;height:18px;accent-color:var(--accent)">
+      Show amortization schedule
+    </label>
+  </div>
+
+  <div id="morFields" class="morOnly hide">
+    <div class="grid">
+      <div class="field"><label>Moratorium (months)</label><input id="lm" type="number" value="3" min="1" step="1"></div>
+      <div class="field"><label>Interest treatment</label><select id="li"><option value="cap">Capitalize interest</option><option value="pay">Pay interest during moratorium</option></select></div>
+    </div>
+  </div>
+
+  <div class="loanActions">
+    <button class="secondaryAction" id="loanReset" type="button">RESET</button>
+    <button class="action" id="loanCalculate" type="button">CALCULATE</button>
+  </div>
+  <div id="loanRes" aria-live="polite"></div>
+  <div id="amortSection" class="hide">
+    <div class="amortTitle">Amortization Schedule</div>
+    <div class="amortScroll">
+      <table class="amortTable">
+        <thead><tr><th>Month</th><th>Phase</th><th>EMI / Interest Paid</th><th>Principal</th><th>Interest</th><th>Balance</th></tr></thead>
+        <tbody id="amortBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+</div>
+
+<div id="loanReport" class="loanPane">
+<div class="card loanCard">
+  <div class="loanModeTitle">Loan Report</div>
+  <div id="loanReportContent" class="reportEmpty">Calculate a loan to see the full report.</div>
+</div>
+</div>
+
+<div id="loanGraph" class="loanPane">
+<div class="card loanCard">
+  <div class="loanModeTitle">Loan Graph</div>
+  <canvas id="loanChart" width="800" height="340"></canvas>
+  <div class="muted graphCaption">Outstanding principal over the repayment period.</div>
+</div>
+</div>
+
+<div id="loanSave" class="loanPane">
+<div class="card loanCard">
+  <div class="loanModeTitle">Saved Loans</div>
+  <div class="field"><label>Loan name</label><input id="loanName" type="text" maxlength="40" placeholder="e.g. Home Loan"></div>
+  <button class="action" id="saveLoanBtn" type="button">SAVE LOAN</button>
+  <div id="savedLoans" class="savedLoans"></div>
+</div>
+</div>
+</section>
+
+<section id="deposit" class="page">
+<div class="card"><div class="title">FD / RD Calculator</div>
+<div class="seg"><button class="active" onclick="setDep(false,this)">FD</button><button onclick="setDep(true,this)">RD</button></div>
+<div class="grid"><div class="field"><label id="depLabel">Deposit (₹)</label><input id="da" type="number" value="100000"></div><div class="field"><label>Rate (% p.a.)</label><input id="dr" type="number" value="7" step=".01"></div><div class="field"><label>Term</label><input id="dt" type="number" value="2"></div><div class="field"><label>Term unit</label><select id="du"><option value="y">Years</option><option value="m">Months</option><option value="d">Days</option></select></div></div>
+<div class="field"><label>Compounding</label><select id="dc"><option value="4">Quarterly</option><option value="12">Monthly</option><option value="2">Half-yearly</option><option value="1">Yearly</option></select></div>
+<button class="action" onclick="calcDeposit()">Calculate</button><div id="depRes"></div></div>
+</section>
+
+<section id="sip" class="page">
+<div class="card"><div class="title">SIP Calculator</div>
+<div class="grid"><div class="field"><label>Monthly SIP (₹)</label><input id="sa" type="number" value="10000"></div><div class="field"><label>Expected return (% p.a.)</label><input id="sr" type="number" value="12"></div><div class="field"><label>Term (years)</label><input id="sy" type="number" value="10"></div><div class="field"><label>Step-up</label><select id="st" onchange="toggleStep()"><option value="none">None</option><option value="pct">Percentage / year</option><option value="fixed">Fixed ₹ / year</option></select></div></div>
+<div id="stepBox" class="field hide"><label>Step-up value</label><input id="sv" type="number" value="10"></div>
+<button class="action" onclick="calcSIP()">Calculate</button><div id="sipRes"></div><canvas id="sipChart" width="800" height="340"></canvas></div>
+</section>
+
+<section id="history" class="page"><div class="card"><div class="title">Calculation History</div><button class="action" onclick="clearHistory()">Clear history</button><div id="historyList" class="history"></div></div></section>
+</main>
+<nav class="bottomNav" aria-label="Main navigation">
+  <button class="bottomItem active" data-bottom="calc"><span class="bottomIcon">▦</span><span>Calculator</span></button>
+  <button class="bottomItem" data-bottom="date"><span class="bottomIcon">▣</span><span>Date</span></button>
+  <button class="bottomItem" data-bottom="loan"><span class="bottomIcon">₹</span><span>Loan</span></button>
+  <button class="bottomItem" data-bottom="deposit"><span class="bottomIcon">▥</span><span>Finance</span></button>
+  <button class="bottomItem" data-bottom="history"><span class="bottomIcon">◷</span><span>History</span></button>
+</nav>
+<div id="toast" class="toast"></div>
+</div>
+
+<script>
+/* Count Craze - APK-friendly single-file app.
+   Uses only HTML/CSS/JS, localStorage and browser vibration/audio APIs.
+   Suitable as a WebView/HTML source for AppsGeyser-style APK wrappers. */
+
+let historyData=JSON.parse(localStorage.getItem('count_craze_history')||'[]');
+let expr='',lastAnswer=0,dateMode='diff',loanMode='emi',isRD=false,audioCtx=null;
+
+const $=id=>document.getElementById(id);
+const money=n=>'₹ '+Number(n||0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
+const valid=n=>Number.isFinite(n)&&n>=0;
+
+function feedback(kind='tap'){
+ try{if(navigator.vibrate) navigator.vibrate(kind==='equal'?[18,12,25]:kind==='error'?[35,20,35]:12)}catch(e){}
+ try{
+   audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)();
+   if(audioCtx.state==='suspended') audioCtx.resume();
+   const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+   o.frequency.value=kind==='equal'?520:kind==='error'?150:390;
+   o.type='sine';g.gain.setValueAtTime(.035,audioCtx.currentTime);
+   g.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+.055);
+   o.connect(g);g.connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+.06);
+ }catch(e){}
+}
+document.addEventListener('pointerdown',e=>{if(e.target.closest('button')) feedback()}, {passive:true});
+
+function toast(t){$('toast').textContent=t;$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),1500)}
+function openDrawer(){ $('drawer').classList.add('open') }
+function closeDrawer(){ $('drawer').classList.remove('open') }
+$('menuBtn').onclick=openDrawer;$('closeBtn').onclick=closeDrawer;$('scrim').onclick=closeDrawer;
+
+document.querySelectorAll('.option').forEach(b=>b.onclick=()=>{
+ document.querySelectorAll('.option').forEach(x=>x.classList.remove('active'));b.classList.add('active');
+ document.querySelectorAll('.bottomItem').forEach(x=>x.classList.toggle('active',x.dataset.bottom===b.dataset.page));
+ document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));$(b.dataset.page).classList.add('active');closeDrawer();renderHistory();
+});
+
+function showCalc(){$('disp').textContent=expr||'0'}
+function calcKey(k){
+ if(k==='AC'){expr='';showCalc();return}
+ if(k==='back'){expr=expr.slice(0,-1);showCalc();return}
+ if(k==='%'){try{expr=String(Number(expr)/100)}catch(e){}showCalc();return}
+ if(k==='ans'){expr+=String(lastAnswer);showCalc();return}
+ if(k==='='){
+  try{
+   let safe=expr.replace(/×/g,'*').replace(/÷/g,'/');
+   if(!/^[0-9+\-*/().\s]+$/.test(safe))throw Error();
+   let result=Function('"use strict";return ('+safe+')')();
+   if(!Number.isFinite(result))throw Error();
+   lastAnswer=result;saveHistory('Calculator',expr+' = '+result);expr=String(Number(result.toFixed(10)));showCalc();feedback('equal');
+  }catch(e){expr='Error';showCalc();feedback('error');setTimeout(()=>{expr='';showCalc()},800)}
+  return
+ }
+ if(expr==='Error')expr='';
+ if(k==='.'&&expr.split(/[+\-*/]/).pop().includes('.'))return;
+ expr+=k;showCalc();
+}
+document.querySelectorAll('.key').forEach(b=>b.onclick=()=>calcKey(b.dataset.k));
+document.addEventListener('keydown',e=>{let k=e.key;if(/[0-9.+\-*/]/.test(k))calcKey(k);else if(k==='Enter')calcKey('=');else if(k==='Backspace')calcKey('back');else if(k==='%')calcKey('%')});
+
+function saveHistory(type,text){historyData.unshift({type,text,time:new Date().toLocaleString('en-IN')});historyData=historyData.slice(0,60);localStorage.setItem('count_craze_history',JSON.stringify(historyData));renderHistory()}
+function renderHistory(){$('historyList').innerHTML=historyData.length?historyData.map((h,i)=>`<div class="hist"><div><b>${h.type}</b><div>${h.text}</div><small>${h.time}</small></div><button class="x" onclick="deleteHistory(${i})">×</button></div>`).join(''):'<div class="muted" style="padding:16px 0">No calculations yet.</div>'}
+function deleteHistory(i){historyData.splice(i,1);localStorage.setItem('count_craze_history',JSON.stringify(historyData));renderHistory()}
+function clearHistory(){historyData=[];localStorage.removeItem('count_craze_history');renderHistory();toast('History cleared')}
+
+function todayISO(){let d=new Date();return d.toISOString().slice(0,10)}
+$('d1').value=todayISO();$('d2').value=todayISO();
+
+function setDateMode(m,b){dateMode=m;document.querySelectorAll('#date .seg button').forEach(x=>x.classList.remove('active'));b.classList.add('active');$('dateAmount').classList.toggle('hide',m==='diff')}
+function calcDate(){
+ let a=new Date($('d1').value+'T00:00:00'),b=new Date($('d2').value+'T00:00:00');
+ if(isNaN(a)||isNaN(b)){toast('Choose valid dates');return}
+ if(dateMode==='diff'){
+  let days=Math.round((b-a)/86400000),abs=Math.abs(days);
+  $('dateRes').innerHTML=`<div class="result"><div class="metric"><span>Difference</span><b>${abs.toLocaleString('en-IN')} days</b></div><div class="metric"><span>Approx.</span><b>${Math.floor(abs/7)} weeks</b></div></div>`;
+  saveHistory('Date Difference',abs+' days');
+ }else{
+  let base=a,v=Number($('dnum').value),u=$('dunit').value;if(!valid(v)){toast('Enter a valid value');return}if(dateMode==='sub')v=-v;
+  if(u==='d')base.setDate(base.getDate()+v);else if(u==='w')base.setDate(base.getDate()+v*7);else if(u==='m')base.setMonth(base.getMonth()+v);else base.setFullYear(base.getFullYear()+v);
+  let out=base.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
+  $('dateRes').innerHTML=`<div class="result"><div class="metric" style="grid-column:1/-1"><span>Result date</span><b>${out}</b></div></div>`;saveHistory('Date '+dateMode,out);
+ }
+}
+
+function setLoanMode(m,b){loanMode=m;document.querySelectorAll('#loan .seg button').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.querySelectorAll('.morOnly').forEach(x=>x.classList.toggle('hide',m==='emi'))}
+function emi(p,r,n){r/=1200;return r? p*r*Math.pow(1+r,n)/(Math.pow(1+r,n)-1):p/n}
+function calcLoan(){
+ let p=Number($('la').value),r=Number($('lr').value),n=Math.round(Number($('ly').value)*12);
+ if(p<=0||r<0||n<=0){toast('Enter valid loan details');return}
+ if(loanMode==='emi'){
+  let e=emi(p,r,n),interest=e*n-p;
+  $('loanRes').innerHTML=`<div class="result"><div class="metric"><span>Monthly EMI</span><b>${money(e)}</b></div><div class="metric"><span>Total interest</span><b>${money(interest)}</b></div><div class="metric"><span>Total payment</span><b>${money(e*n)}</b></div><div class="metric"><span>Tenure</span><b>${n} months</b></div></div>`;
+  drawLoan(p,r,n);saveHistory('Loan EMI',money(e));
+ }else{
+  let m=Math.round(Number($('lm').value)),mr=r/1200;if(m<=0){toast('Enter moratorium months');return}
+  let accrued=p*(Math.pow(1+mr,m)-1),balance=$('li').value==='cap'?p+accrued:p,e=emi(balance,r,n);
+  $('loanRes').innerHTML=`<div class="result"><div class="metric"><span>Moratorium interest</span><b>${money(accrued)}</b></div><div class="metric"><span>Balance after</span><b>${money(balance)}</b></div><div class="metric"><span>Revised EMI</span><b>${money(e)}</b></div><div class="metric"><span>Repayment term</span><b>${n} months</b></div></div>`;
+  $('loanChart').classList.add('hide');saveHistory('Loan Moratorium',money(e));
+ }
+}
+function drawLoan(p,r,n){
+ let c=$('loanChart'),x=c.getContext('2d');c.classList.remove('hide');x.clearRect(0,0,c.width,c.height);
+ let e=emi(p,r,n),bal=p,pts=[];for(let i=0;i<n;i++){let interest=bal*r/1200;bal=Math.max(0,bal-(e-interest));pts.push(bal)}
+ x.beginPath();pts.forEach((v,i)=>{let X=20+i/(pts.length-1||1)*760,Y=315-v/p*280;i?x.lineTo(X,Y):x.moveTo(X,Y)});x.stroke();x.fillStyle='#8994a8';x.font='22px system-ui';x.fillText('Loan balance',20,30)
+}
+function setDep(rd,b){isRD=rd;document.querySelectorAll('#deposit .seg button').forEach(x=>x.classList.remove('active'));b.classList.add('active');$('depLabel').textContent=rd?'Monthly deposit (₹)':'Deposit (₹)'}
+function calcDeposit(){
+ let A=Number($('da').value),rate=Number($('dr').value)/100,t=Number($('dt').value),u=$('du').value;
+ if(A<=0||rate<0||t<=0){toast('Enter valid deposit details');return}
+ let years=u==='y'?t:u==='m'?t/12:t/365,n=Math.max(1,Math.round(years*12)),fv;
+ if(isRD){
+  let m=rate/12;fv=rate?A*((Math.pow(1+m,n)-1)/m)*(1+m):A*n;let inv=A*n;
+  $('depRes').innerHTML=`<div class="result"><div class="metric"><span>Maturity</span><b>${money(fv)}</b></div><div class="metric"><span>Invested</span><b>${money(inv)}</b></div><div class="metric"><span>Interest</span><b>${money(fv-inv)}</b></div></div>`;saveHistory('RD',money(fv))
+ }else{
+  let q=Number($('dc').value);fv=A*Math.pow(1+rate/q,q*years);
+  $('depRes').innerHTML=`<div class="result"><div class="metric"><span>Maturity</span><b>${money(fv)}</b></div><div class="metric"><span>Principal</span><b>${money(A)}</b></div><div class="metric"><span>Interest</span><b>${money(fv-A)}</b></div></div>`;saveHistory('FD',money(fv))
+ }
+}
+function toggleStep(){$('stepBox').classList.toggle('hide',$('st').value==='none')}
+function calcSIP(){
+ let base=Number($('sa').value),annual=Number($('sr').value)/100,years=Math.round(Number($('sy').value)),type=$('st').value,step=Number($('sv').value);
+ if(base<=0||annual<0||years<=0){toast('Enter valid SIP details');return}
+ let monthly=annual/12,total=0,invested=0,vals=[];
+ for(let y=1;y<=years;y++){
+  let sip=type==='pct'?base*Math.pow(1+step/100,y-1):type==='fixed'?base+step*(y-1):base;
+  for(let m=0;m<12;m++){total=total*(1+monthly)+sip;invested+=sip}vals.push(total)
+ }
+ $('sipRes').innerHTML=`<div class="result"><div class="metric"><span>Future value</span><b>${money(total)}</b></div><div class="metric"><span>Invested</span><b>${money(invested)}</b></div><div class="metric"><span>Estimated gain</span><b>${money(total-invested)}</b></div></div>`;
+ drawSIP(vals);saveHistory('SIP',money(total))
+}
+function drawSIP(vals){let c=$('sipChart'),x=c.getContext('2d');x.clearRect(0,0,c.width,c.height);let max=Math.max(...vals);x.beginPath();vals.forEach((v,i)=>{let X=20+i/(vals.length-1||1)*760,Y=315-v/max*280;i?x.lineTo(X,Y):x.moveTo(X,Y)});x.stroke();x.fillStyle='#8994a8';x.font='22px system-ui';x.fillText('Portfolio value by year',20,30)}
+
+document.querySelectorAll('.bottomItem').forEach(b=>b.addEventListener('click',()=>{
+  const page=b.dataset.bottom;
+  document.querySelectorAll('.bottomItem').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active');
+  document.querySelectorAll('.option').forEach(x=>x.classList.toggle('active',x.dataset.page===page));
+  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+  const target=document.getElementById(page);
+  if(target) target.classList.add('active');
+  if(page==='history') renderHistory();
+}));
+
+/* Loan module: Input / Report / Graph / Save */
+let loanModeState='emi';
+let loanResult=null;
+let savedLoans=JSON.parse(localStorage.getItem('count_craze_saved_loans')||'[]');
+
+function loanEMI(principal, annualRate, months){
+  const r=annualRate/1200;
+  return r ? principal*r*Math.pow(1+r,months)/(Math.pow(1+r,months)-1) : principal/months;
+}
+function getLoanMonths(){
+  const value=Number($('ly').value);
+  return $('loanUnit').value==='m'?Math.round(value):Math.round(value*12);
+}
+function loanValidate(){
+  const p=Number($('la').value), r=Number($('lr').value), n=getLoanMonths();
+  if(!Number.isFinite(p)||p<=0||!Number.isFinite(r)||r<0||!Number.isFinite(n)||n<=0){toast('Enter valid loan details');return null}
+  return {p,r,n};
+}
+function setLoanPane(name){
+  document.querySelectorAll('.loanTab').forEach(b=>b.classList.toggle('active',b.dataset.loantab===name));
+  document.querySelectorAll('.loanPane').forEach(p=>p.classList.remove('active'));
+  const map={input:'loanInput',report:'loanReport',graph:'loanGraph',save:'loanSave'};
+  $(map[name]).classList.add('active');
+  if(name==='graph'&&loanResult) drawLoanGraph(loanResult);
+  if(name==='report') renderLoanReport();
+  if(name==='save') renderSavedLoans();
+}
+document.querySelectorAll('.loanTab').forEach(b=>b.addEventListener('click',()=>setLoanPane(b.dataset.loantab)));
+
+document.querySelectorAll('[data-loanmode]').forEach(b=>b.addEventListener('click',()=>{
+  loanModeState=b.dataset.loanmode;
+  document.querySelectorAll('[data-loanmode]').forEach(x=>x.classList.toggle('active',x.dataset.loanmode===loanModeState));
+  $('morFields').classList.toggle('hide',loanModeState!=='mor');
+  $('loanRes').innerHTML='';
+}));
+
+function calculateLoanNew(){
+  const base=loanValidate();if(!base)return;
+  const {p,r,n}=base;
+  if(loanModeState==='emi'){
+    const e=loanEMI(p,r,n), total=e*n, interest=total-p;
+    loanResult={mode:'emi',p,r,n,emi:e,total,interest,balance:p,morInterest:0};
+  }else{
+    const m=Math.round(Number($('lm').value));
+    if(!Number.isFinite(m)||m<=0){toast('Enter valid moratorium months');return}
+    const monthlyRate=r/1200;
+    const accrued=p*(Math.pow(1+monthlyRate,m)-1);
+    const balance=$('li').value==='cap'?p+accrued:p;
+    const e=loanEMI(balance,r,n);
+    loanResult={mode:'mor',p,r,n,emi:e,total:e*n+(($('li').value==='pay')?accrued:0),interest:e*n-balance+($('li').value==='pay'?accrued:0),balance,morInterest:accrued,morMonths:m,treatment:$('li').value};
+  }
+  renderLoanResult();
+  renderLoanReport();
+  drawLoanGraph(loanResult);
+  saveHistory('Loan '+(loanResult.mode==='emi'?'EMI':'Moratorium'),money(loanResult.emi));
+  toast('Loan calculated');
+}
+function renderLoanResult(){
+  if(!loanResult)return;
+  const x=loanResult;
+  $('loanRes').innerHTML=`<div class="result">
+    <div class="metric"><span>Monthly EMI</span><b>${money(x.emi)}</b></div>
+    <div class="metric"><span>Total Interest</span><b>${money(x.interest)}</b></div>
+    <div class="metric"><span>Total Payment</span><b>${money(x.total)}</b></div>
+    <div class="metric"><span>Term</span><b>${x.n} months</b></div>
+  </div>`;
+}
+function renderLoanReport(){
+  if(!loanResult){$('loanReportContent').innerHTML='<div class="reportEmpty">Calculate a loan to see the full report.</div>';return}
+  const x=loanResult;
+  const mor=x.mode==='mor'?`
+    <div class="reportRow"><span>Moratorium</span><b>${x.morMonths} months</b></div>
+    <div class="reportRow"><span>Moratorium Interest</span><b>${money(x.morInterest)}</b></div>
+    <div class="reportRow"><span>Balance After Moratorium</span><b>${money(x.balance)}</b></div>
+  `:'';
+  $('loanReportContent').innerHTML=`<div class="reportGrid">
+    <div class="reportRow"><span>Loan Amount</span><b>${money(x.p)}</b></div>
+    <div class="reportRow"><span>Annual Rate</span><b>${x.r.toFixed(2)}%</b></div>
+    <div class="reportRow"><span>Loan Term</span><b>${x.n} months</b></div>
+    <div class="reportRow"><span>Monthly EMI</span><b>${money(x.emi)}</b></div>
+    <div class="reportRow"><span>Total Interest</span><b>${money(x.interest)}</b></div>
+    <div class="reportRow"><span>Total Payment</span><b>${money(x.total)}</b></div>${mor}
+  </div>`;
+}
+function drawLoanGraph(x){
+  const c=$('loanChart');if(!c||!x)return;
+  const ctx=c.getContext('2d');ctx.clearRect(0,0,c.width,c.height);
+  let bal=x.balance, pts=[bal], monthly=x.r/1200, e=x.emi;
+  for(let i=0;i<x.n;i++){const interest=bal*monthly;bal=Math.max(0,bal-(e-interest));pts.push(bal)}
+  const max=Math.max(1,x.p,x.balance), left=35,right=780,top=45,bottom=310;
+  ctx.strokeStyle=getComputedStyle(document.documentElement).getPropertyValue('--accent').trim()||'#1976ff';
+  ctx.lineWidth=5;ctx.beginPath();
+  pts.forEach((v,i)=>{const X=left+i/(pts.length-1||1)*(right-left),Y=bottom-(v/max)*(bottom-top);i?ctx.lineTo(X,Y):ctx.moveTo(X,Y)});
+  ctx.stroke();
+  ctx.fillStyle=getComputedStyle(document.documentElement).getPropertyValue('--muted').trim()||'#777';
+  ctx.font='22px system-ui';ctx.fillText('Outstanding balance',35,30);
+}
+$('loanCalculate').addEventListener('click',calculateLoanNew);
+$('loanReset').addEventListener('click',()=>{
+  $('la').value=1000000;$('lr').value=8.5;$('ly').value=10;$('loanUnit').value='y';$('lm').value=3;$('li').value='cap';
+  loanResult=null;$('loanRes').innerHTML='';renderLoanReport();toast('Loan reset');
+});
+
+$('saveLoanBtn').addEventListener('click',()=>{
+  if(!loanResult){toast('Calculate a loan first');return}
+  let name=$('loanName').value.trim()||'My Loan';
+  savedLoans.unshift({id:Date.now(),name,data:loanResult});
+  savedLoans=savedLoans.slice(0,30);
+  localStorage.setItem('count_craze_saved_loans',JSON.stringify(savedLoans));
+  $('loanName').value='';renderSavedLoans();toast('Loan saved');
+});
+function renderSavedLoans(){
+  if(!savedLoans.length){$('savedLoans').innerHTML='<div class="reportEmpty">No saved loans yet.</div>';return}
+  $('savedLoans').innerHTML=savedLoans.map(s=>{
+    const x=s.data;
+    return `<article class="savedLoan">
+      <h3>${escapeHTML(s.name)}</h3>
+      <p><strong>Loan Amount:</strong> ${money(x.p)}</p>
+      <p><strong>Annual Interest Rate:</strong> ${x.r.toFixed(2)}%</p>
+      <p><strong>Loan Term:</strong> ${x.n} Months</p>
+      <p><strong>EMI:</strong> ${money(x.emi)}</p>
+      <div class="savedBtns"><button type="button" data-open="${s.id}">OPEN</button><button type="button" data-delete="${s.id}">DELETE</button></div>
+    </article>`
+  }).join('');
+  document.querySelectorAll('[data-open]').forEach(b=>b.addEventListener('click',()=>{
+    const s=savedLoans.find(x=>x.id===Number(b.dataset.open));if(!s)return;
+    const x=s.data;loanResult=x;
+    $('la').value=x.p;$('lr').value=x.r;
+    $('loanUnit').value='m';$('ly').value=x.n;
+    loanModeState=x.mode;
+    document.querySelectorAll('[data-loanmode]').forEach(z=>z.classList.toggle('active',z.dataset.loanmode===loanModeState));
+    $('morFields').classList.toggle('hide',loanModeState!=='mor');
+    if(x.mode==='mor'){$('lm').value=x.morMonths||3;$('li').value=x.treatment||'cap'}
+    renderLoanResultEnhanced();renderLoanReportEnhanced();setLoanPane('input');toast('Saved loan opened');
+  }));
+  document.querySelectorAll('[data-delete]').forEach(b=>b.addEventListener('click',()=>{
+    savedLoans=savedLoans.filter(x=>x.id!==Number(b.dataset.delete));localStorage.setItem('count_craze_saved_loans',JSON.stringify(savedLoans));renderSavedLoans();toast('Saved loan deleted');
+  }));
+}
+function escapeHTML(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+renderSavedLoans();
+
+toggleStep();renderHistory();
+let memory=0, powered=true;
+const themeBtn=$('themeBtn');
+function setTheme(mode){
+  document.documentElement.dataset.theme=mode;
+  document.documentElement.classList.toggle('day-mode',mode!=='dark');
+  document.documentElement.classList.toggle('night-mode',mode==='dark');
+  
+  document.documentElement.dataset.theme=mode;
+  localStorage.setItem('count_craze_theme',mode);
+  themeBtn.textContent=mode==='dark'?'☀️':'🌙';
+  themeBtn.setAttribute('aria-label',mode==='dark'?'Switch to light mode':'Switch to dark mode');
+}
+setTheme(localStorage.getItem('count_craze_theme')||'light');
+themeBtn.addEventListener('click',()=>setTheme(document.documentElement.dataset.theme==='dark'?'light':'dark'));
+
+const originalCalcKey=calcKey;
+calcKey=function(k){
+ if(k==='ON'){powered=true;expr='';showCalc();toast('Calculator ON');return}
+ if(k==='CE'){expr='';showCalc();return}
+ if(k==='MC'){memory=0;toast('Memory cleared');return}
+ if(k==='M+'){try{memory+=Number(expr||0);toast('Added to memory')}catch(e){}return}
+ if(k==='M-'){try{memory-=Number(expr||0);toast('Subtracted from memory')}catch(e){}return}
+ if(k==='+/-'){if(expr)expr=expr.startsWith('-')?expr.slice(1):'-'+expr;showCalc();return}
+ if(k==='sqrt'){try{let v=Math.sqrt(Number(expr||0));if(!Number.isFinite(v))throw Error();lastAnswer=v;expr=String(Number(v.toFixed(10)));showCalc()}catch(e){expr='Error';showCalc()}return}
+ if(k==='OFF'){powered=false;expr='';$('disp').textContent='OFF';$('expr').textContent='';return}
+ if(!powered && k!=='ON')return;
+ if(k==='ans' && memory!==0){expr+=String(memory);showCalc();return}
+ originalCalcKey(k);
+};
+
+</script>
+
+<script>
+/* Count Craze - corrected loan moratorium + amortization module */
+(function(){
+  function loanCalcEnhanced(){
+    const p=Number($('la').value), r=Number($('lr').value), n=getLoanMonths();
+    if(!Number.isFinite(p)||p<=0||!Number.isFinite(r)||r<0||!Number.isFinite(n)||n<=0){toast('Enter valid loan details');return}
+    if(loanModeState==='emi'){
+      const e=loanEMI(p,r,n), total=e*n;
+      loanResult={mode:'emi',p,r,n,emi:e,total,interest:total-p,balance:p,morInterest:0,treatment:'none',morMonths:0};
+    }else{
+      const m=Math.round(Number($('lm').value));
+      if(!Number.isFinite(m)||m<1){toast('Enter valid moratorium months');return}
+      if(m>=n){toast('Moratorium must be shorter than the loan term');return}
+      const mr=r/1200;
+      const accrued=r===0?0:p*(Math.pow(1+mr,m)-1);
+      const pays=$('li').value==='pay';
+      const postBalance=pays?p:p+accrued;
+      const postMonths=n-m;
+      const e=loanEMI(postBalance,r,postMonths);
+      const repaymentInterest=e*postMonths-postBalance;
+      const totalInterest=repaymentInterest+(pays?accrued:accrued);
+      const totalPayment=postBalance+repaymentInterest+(pays?accrued:0);
+      loanResult={
+        mode:'mor',p,r,n,emi:e,total:totalPayment,interest:totalInterest,
+        balance:postBalance,morInterest:accrued,morMonths:m,
+        treatment:pays?'pay':'cap',postMonths
+      };
+    }
+    renderLoanResultCorrect();
+    renderLoanReportCorrect();
+    renderAmortizationCorrect();
+    drawLoanGraphCorrect(loanResult);
+    toast('Loan calculated');
+  }
+
+  function renderLoanResultCorrect(){
+    const x=loanResult;
+    let mor='';
+    if(x.mode==='mor'){
+      mor=`<div class="metric"><span>Moratorium Interest</span><b>${money(x.morInterest)}</b></div>
+      <div class="metric"><span>Interest Paid During Moratorium</span><b>${x.treatment==='pay'?money(x.morInterest):'₹ 0.00'}</b></div>
+      <div class="metric"><span>EMI After Moratorium</span><b>${money(x.emi)}</b></div>
+      <div class="metric"><span>Balance After Moratorium</span><b>${money(x.balance)}</b></div>`;
+    }
+    $('loanRes').innerHTML=`<div class="result">
+      ${x.mode==='emi'?`<div class="metric"><span>Monthly EMI</span><b>${money(x.emi)}</b></div>`:''}
+      <div class="metric"><span>Total Interest</span><b>${money(x.interest)}</b></div>
+      <div class="metric"><span>Total Payment</span><b>${money(x.total)}</b></div>
+      <div class="metric"><span>Repayment Term</span><b>${x.mode==='mor'?x.postMonths:x.n} months</b></div>${mor}
+    </div>`;
+  }
+
+  function renderLoanReportCorrect(){
+    if(!loanResult){$('loanReportContent').innerHTML='<div class="reportEmpty">Calculate a loan to see the full report.</div>';return}
+    const x=loanResult;
+    const mor=x.mode==='mor'?`
+      <div class="reportRow"><span>Moratorium Period</span><b>${x.morMonths} months</b></div>
+      <div class="reportRow"><span>Interest Accrued During Moratorium</span><b>${money(x.morInterest)}</b></div>
+      <div class="reportRow"><span>Interest To Pay During Moratorium</span><b>${x.treatment==='pay'?money(x.morInterest):'₹ 0.00'}</b></div>
+      <div class="reportRow"><span>Interest Treatment</span><b>${x.treatment==='pay'?'Paid separately':'Added to principal'}</b></div>
+      <div class="reportRow"><span>Principal/Balance After Moratorium</span><b>${money(x.balance)}</b></div>
+      <div class="reportRow"><span>EMI After Moratorium</span><b>${money(x.emi)}</b></div>
+      <div class="reportRow"><span>Remaining EMI Period</span><b>${x.postMonths} months</b></div>`:'';
+    $('loanReportContent').innerHTML=`<div class="reportGrid">
+      <div class="reportRow"><span>Loan Amount</span><b>${money(x.p)}</b></div>
+      <div class="reportRow"><span>Annual Rate</span><b>${x.r.toFixed(2)}%</b></div>
+      <div class="reportRow"><span>Original Term</span><b>${x.n} months</b></div>
+      ${x.mode==='emi'?`<div class="reportRow"><span>Monthly EMI</span><b>${money(x.emi)}</b></div>`:''}
+      <div class="reportRow"><span>Total Interest</span><b>${money(x.interest)}</b></div>
+      <div class="reportRow"><span>Total Payment</span><b>${money(x.total)}</b></div>${mor}
+    </div>`;
+  }
+
+  function amortRows(x){
+    const rows=[];
+    let bal=x.p;
+    const mr=x.r/1200;
+    if(x.mode==='mor'){
+      for(let i=1;i<=x.morMonths;i++){
+        const interest=bal*mr;
+        const end=x.treatment==='cap'?bal+interest:bal;
+        rows.push({period:i,label:'Moratorium',emi:x.treatment==='pay'?interest:0,principal:0,interest,balance:end,paidInterest:x.treatment==='pay'?interest:0});
+        bal=end;
+      }
+      for(let j=1;j<=x.postMonths && bal>0.005;j++){
+        const interest=bal*mr;
+        const principal=Math.min(bal,Math.max(0,x.emi-interest));
+        const pay=principal+interest;
+        bal=Math.max(0,bal-principal);
+        rows.push({period:x.morMonths+j,label:'EMI',emi:pay,principal,interest,balance:bal,paidInterest:0});
+      }
+    }else{
+      for(let j=1;j<=x.n && bal>0.005;j++){
+        const interest=bal*mr;
+        const principal=Math.min(bal,Math.max(0,x.emi-interest));
+        const pay=principal+interest;
+        bal=Math.max(0,bal-principal);
+        rows.push({period:j,label:'EMI',emi:pay,principal,interest,balance:bal,paidInterest:0});
+      }
+    }
+    return rows;
+  }
+
+  function renderAmortizationCorrect(){
+    const section=$('amortSection');
+    if(!loanResult || !$('showAmort').checked){section.classList.add('hide');return}
+    section.classList.remove('hide');
+    const rows=amortRows(loanResult);
+    $('amortBody').innerHTML=rows.map(x=>`<tr>
+      <td>${x.period}</td><td>${x.label}</td><td>${money(x.emi)}</td><td>${money(x.principal)}</td><td>${money(x.interest)}</td><td>${money(x.balance)}</td>
+    </tr>`).join('');
+  }
+
+  function drawLoanGraphCorrect(x){
+    const c=$('loanChart');if(!c||!x)return;
+    const ctx=c.getContext('2d');ctx.clearRect(0,0,c.width,c.height);
+    const rows=amortRows(x), vals=[x.p].concat(rows.map(r=>r.balance));
+    const max=Math.max(1,...vals), L=35,R=780,T=45,B=310;
+    ctx.strokeStyle=getComputedStyle(document.documentElement).getPropertyValue('--accent').trim()||'#1976ff';
+    ctx.lineWidth=5;ctx.beginPath();
+    vals.forEach((v,i)=>{const X=L+i/(vals.length-1||1)*(R-L),Y=B-(v/max)*(B-T);i?ctx.lineTo(X,Y):ctx.moveTo(X,Y)});
+    ctx.stroke();
+    ctx.fillStyle=getComputedStyle(document.documentElement).getPropertyValue('--muted').trim()||'#777';
+    ctx.font='22px system-ui';ctx.fillText('Outstanding balance',35,30);
+  }
+
+  try{$('loanCalculate').removeEventListener('click',calculateLoanNew)}catch(e){}
+  $('loanCalculate').addEventListener('click',loanCalcEnhanced);
+  $('showAmort').addEventListener('change',renderAmortizationCorrect);
+
+  /* Make the moratorium choice explicit in the UI. */
+  $('li').addEventListener('change',()=>{
+    const hint=$('morInterestHint');
+    if(hint) hint.textContent=$('li').value==='pay'
+      ? 'Interest accrued during the moratorium will be paid separately. EMI starts after the moratorium.'
+      : 'Interest accrued during the moratorium is added to the loan balance. The revised EMI starts after the moratorium.';
+  });
+
+  /* Add a visible explanation under the treatment selector. */
+  const treatment=$('li');
+  if(treatment && !document.getElementById('morInterestHint')){
+    const h=document.createElement('div');
+    h.id='morInterestHint';
+    h.style.cssText='color:var(--muted);font-size:11px;line-height:1.45;margin-top:6px';
+    treatment.parentNode.appendChild(h);
+    h.textContent='Interest accrued during the moratorium is added to the loan balance. The revised EMI starts after the moratorium.';
+  }
+})();
+
+/* =========================================================
+   CHROME / ANDROID INSTALL (PWA)
+   Works when hosted on HTTPS or localhost.
+========================================================= */
+let deferredInstallPrompt = null;
+const installBtn = document.getElementById("installAppBtn");
+
+window.addEventListener("beforeinstallprompt", (e) => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  if (installBtn) installBtn.classList.add("show");
+});
+
+if (installBtn) {
+  installBtn.addEventListener("click", async () => {
+    if (!deferredInstallPrompt) {
+      toast("Use Chrome menu → Add to Home screen");
+      return;
+    }
+    deferredInstallPrompt.prompt();
+    const result = await deferredInstallPrompt.userChoice;
+    deferredInstallPrompt = null;
+    installBtn.classList.remove("show");
+    if (result.outcome === "accepted") toast("Count Craze installed");
+  });
+}
+
+window.addEventListener("appinstalled", () => {
+  if (installBtn) installBtn.classList.remove("show");
+  toast("Count Craze installed");
+});
+
+/* Register the offline service worker when available. */
+if ("serviceWorker" in navigator && location.protocol !== "file:") {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js").catch(() => {});
+  });
+}
+
+</script>
+
+</body>
+</html>

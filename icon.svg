@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+<rect width="512" height="512" rx="112" fill="#1976ff"/>
+<rect x="82" y="82" width="348" height="348" rx="70" fill="#0b1018"/>
+<rect x="116" y="116" width="280" height="110" rx="25" fill="#c9e6fc"/>
+<text x="350" y="201" text-anchor="end" font-family="Arial,sans-serif" font-size="105" font-weight="900" fill="#05070a">0</text>
+<g font-family="Arial,sans-serif" font-size="54" font-weight="900" text-anchor="middle">
+<rect x="116" y="258" width="82" height="65" rx="16" fill="#ff3948"/><text x="157" y="305" fill="white">C</text>
+<rect x="215" y="258" width="82" height="65" rx="16" fill="#e1e5ea"/><text x="256" y="305" fill="#05070a">7</text>
+<rect x="314" y="258" width="82" height="65" rx="16" fill="#1976ff"/><text x="355" y="305" fill="white">÷</text>
+<rect x="116" y="338" width="82" height="65" rx="16" fill="#ff9f18"/><text x="157" y="385" fill="#111">M</text>
+<rect x="215" y="338" width="82" height="65" rx="16" fill="#e1e5ea"/><text x="256" y="385" fill="#05070a">4</text>
+<rect x="314" y="338" width="82" height="65" rx="16" fill="#ffd21c"/><text x="355" y="385" fill="#241d00">=</text>
+</g>
+</svg>
